@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-title" content="「ONE · 一个」">
+    <meta name="keywords" content="ONE,一个,ONE一个,yige,文章,问题,东西,金句,文艺,阅读">
+    <title>「ONE · 一个」文章归档</title>
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #page {
+        text-align: center;
+        position: sticky;
+        top: 0;
+        background-color: #fff;
+    }
+    #list {
+        margin: 0 auto;
+        max-width: 750px;
+        padding-bottom: 50px;
+    }
+    #pager {
+        text-align: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #fff;
+    }
+    .title {
+        font-size: 14px;
+    }
+    .author {
+        margin: 0;
+        font-size: 13px;
+        color: #666;
+    }
+    .editor {
+        margin: 0;
+        font-size: 13px;
+        color: #666;
+    }
+</style>
+
+<body>
+    <h2 id="page"></h2>
+    <ul id="list">
+
+    </ul>
+    <div id="pager">
+
+    </div>
+</body>
+<script>
+    const params = new URLSearchParams(location.search);
+    const page = params.get("page") || 1;
+    const pageEle = document.querySelector("#page");
+    const listEle = document.querySelector("#list");
+    const pagerEle = document.querySelector("#pager");
+    (function fetchList() {
+        fetch('/pages/' + page + '.json').then(res => res.json())
+            .then(list => {
+                pageEle.innerText = `当前是第${page}页`;
+                makePager(page);
+                listRender(list)
+            })
+            .catch(e => {
+                location.href = "/"
+            })
+    })();
+    function makePager(page) {
+        const prev = document.createElement("a"), next = document.createElement("a");
+        prev.innerText = "上一页";
+        prev.href = "/?page=" + (Number(page) - 1);
+        next.innerText = "下一页";
+        next.href = "/?page=" + (Number(page) + 1);
+        if (page > 1) {
+            pagerEle.appendChild(prev)
+        }
+        pagerEle.appendChild(next)
+    }
+    function listRender(list) {
+        const fragment = document.createDocumentFragment();
+        list.forEach(item => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <a target="_blank" class="title" href="/archived/${item.id}.html">${item.title}<a/>
+                <p class="author">${item.author}</p>
+                <p class="editor">${item.editor}</p>
+            `
+            fragment.appendChild(li);
+        })
+        listEle.appendChild(fragment)
+    }
+</script>
+
+</html>
